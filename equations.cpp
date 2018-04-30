@@ -15,7 +15,8 @@ using namespace std::literals::chrono_literals;
 
 void Jacobi (Matrix&, Matrix&, Matrix&);
 void Gauss_Seidel (Matrix&, Matrix&, Matrix&);
-void LU (Matrix&, Matrix&);
+void LU_split (Matrix&, Matrix&);
+void LU_factorization (Matrix&, Matrix&, Matrix&);
 
 int main ()
 {
@@ -66,39 +67,8 @@ int main ()
 			if (i == j)
 				A.matrix[i][j] = a1c;
 
-	Matrix L (4, 4);
-	Matrix U (4, 4);
-	
-	U.matrix[0][0] = 2;
-	U.matrix[0][1] = 1;
-	U.matrix[0][2] = 1;
-	U.matrix[0][3] = 0;
-	U.matrix[1][0] = 4;
-	U.matrix[1][1] = 3;
-	U.matrix[1][2] = 3;
-	U.matrix[1][3] = 1;
-	U.matrix[2][0] = 8;
-	U.matrix[2][1] = 7;
-	U.matrix[2][2] = 9;
-	U.matrix[2][3] = 5;
-	U.matrix[3][0] = 6;
-	U.matrix[3][1] = 7;
-	U.matrix[3][2] = 9;
-	U.matrix[3][3] = 8;
+	LU_factorization (A, x, b);
 
-	U.print ();
-
-	for (int i = 0; i < L.y; i++)
-		for (int j = 0; j < L.x; j++)
-			if (i == j)
-				L.matrix[i][j] = 1;
-
-	LU (L, U);
-	L.print ();
-	U.print ();
-
-
-	
 	return 0;
 }
 
@@ -193,7 +163,7 @@ void Gauss_Seidel (Matrix& A, Matrix& x, Matrix& b)
 	std::cout << time.count () << "ms\n\n";
 }
 
-void LU (Matrix& L, Matrix& U)
+void LU_split (Matrix& L, Matrix& U)
 {
 	for(int k = 0; k < L.y - 1; k++)
 		for (int j = k + 1; j < L.x; j++)
@@ -202,4 +172,45 @@ void LU (Matrix& L, Matrix& U)
 			for (int i = k; i < L.x; i++)
 				U.matrix[j][i] = U.matrix[j][i] - (L.matrix[j][k] * U.matrix[k][i]);
 		}
+}
+
+void LU_factorization (Matrix& A, Matrix& x, Matrix& b)
+{
+	time_point<Clock> start = Clock::now ();
+	std::cout << "\n\nLU below!\n\n";
+
+	Matrix L (A.x, A.y);
+	Matrix U (A.x, A.y);
+	U = A;
+
+	for (int i = 0; i < L.y; i++)
+		for (int j = 0; j < L.x; j++)
+			if (i == j)
+				L.matrix[i][j] = 1;
+
+	LU_split (L, U);
+	Matrix y (1, x.y);
+	y = U * x;
+
+	double sum;
+	y.matrix[0][0] = b.matrix[0][0] / L.matrix[0][0];	// Forward substitution
+	for (int i = 1; i < y.y; i++)
+	{
+		sum = 0;
+		for (int j = 0; j < i; j++)
+			sum += L.matrix[i][j] * y.matrix[j][0];
+		y.matrix[i][0] = (1 / L.matrix[i][i]) * (b.matrix[i][0] - sum);
+	}
+
+	x.matrix[x.y - 1][0] = y.matrix[y.y - 1][0] / U.matrix[U.y - 1][U.x - 1];	// Back substitution
+	for (int i = x.y - 2; i >= 0; i--)
+	{
+		sum = 0;
+		for (int j = i + 1; j < x.y; j++)
+			sum += U.matrix[i][j] * x.matrix[j][0];
+		x.matrix[i][0] = (1 / U.matrix[i][i]) * (y.matrix[i][0] - sum);
+	}
+	time_point<Clock> end = Clock::now ();
+	milliseconds time = duration_cast<milliseconds>(end - start);
+	std::cout << time.count () << "ms\n\n";
 }
