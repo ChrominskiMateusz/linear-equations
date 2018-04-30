@@ -6,7 +6,7 @@ public:
 	int y;
 	double **matrix;
 	void print ();
-	Matrix operator*(const Matrix&) const;
+	Matrix operator*(const Matrix&);
 	Matrix operator+(const Matrix&);
 	Matrix operator-(const Matrix&);
 	Matrix& operator=(const Matrix&);

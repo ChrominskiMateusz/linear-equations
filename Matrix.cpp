@@ -21,11 +21,11 @@ void Matrix::print ()
 	}
 	std::cout << "|_ ";
 	for (int j = 0; j < x - 1; j++)
-		std::cout << std::showpos << std::fixed << std::setprecision (2) << matrix[y - 1][j] << "  ";
-	std::cout << std::showpos << std::fixed << std::setprecision (2) << matrix[y - 1][x - 1] << " _|\n\n\n";
+		std::cout << matrix[y - 1][j] << "  ";
+	std::cout << matrix[y - 1][x - 1] << " _|\n\n\n";
 }
 
-Matrix Matrix::operator*(const Matrix& secound) const
+Matrix Matrix::operator*(const Matrix& secound)
 {
 	Matrix to_ret (secound.x, y);
 	if (x != secound.y)
@@ -104,16 +104,17 @@ Matrix::Matrix (int x, int y) :
 	}
 }
 
-
-
 Matrix::~Matrix ()
 {
-	//if (matrix != nullptr)
-	//	for (int i = 0; i < y; i++)
-	//		if (matrix[i] != nullptr)
-	//		{
-	//			delete[] matrix[i];
-	//			matrix[i] = nullptr;
-	//		}
-	//delete[] matrix;
+	if (x > 0 && y > 0)
+		return;
+	if (matrix != nullptr)
+		for (int i = 0; i < y; i++)
+			if (matrix[i] != nullptr)
+			{
+				delete[] matrix[i];
+				matrix[i] = nullptr;
+			}
+	delete[] matrix;
+	std::cout << "DELETED!" << std::endl;
 }
