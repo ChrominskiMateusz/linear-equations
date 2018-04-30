@@ -16,7 +16,7 @@ void Matrix::print ()
 	{
 		std::cout << "|  ";
 		for (int j = 0; j < x; j++)
-			std::cout << std::showpos << std::fixed << std::setprecision (2) << matrix[i][j] << "  ";
+			std::cout << matrix[i][j] << "  ";
 		std::cout << "|\n";
 	}
 	std::cout << "|_ ";
