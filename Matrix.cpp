@@ -92,6 +92,18 @@ Matrix& Matrix::operator=(const Matrix& secound)
 	return *this;
 }
 
+Matrix::Matrix (const Matrix& m) :
+	x(m.x), y(m.y)
+{
+	matrix = new double *[y];
+	for (int i = 0; i < y; i++)
+	{
+		matrix[i] = new double[x];
+		for (int j = 0; j < x; j++)
+			matrix[i][j] = m.matrix[i][j];
+	}
+}
+
 Matrix::Matrix (int x, int y) :
 	x (x), y (y)
 {
@@ -106,8 +118,6 @@ Matrix::Matrix (int x, int y) :
 
 Matrix::~Matrix ()
 {
-	if (x > 0 && y > 0)
-		return;
 	if (matrix != nullptr)
 		for (int i = 0; i < y; i++)
 			if (matrix[i] != nullptr)
@@ -116,5 +126,4 @@ Matrix::~Matrix ()
 				matrix[i] = nullptr;
 			}
 	delete[] matrix;
-	std::cout << "DELETED!" << std::endl;
 }

@@ -15,10 +15,11 @@ using namespace std::literals::chrono_literals;
 
 void Jacobi (Matrix&, Matrix&, Matrix&);
 void Gauss_Seidel (Matrix&, Matrix&, Matrix&);
+void LU (Matrix&, Matrix&);
 
 int main ()
 {
-	std::cout << std::showpos << std::fixed << std::setprecision (2);
+	std::cout << std::showpos << std::fixed << std::setprecision (2);      //   Setting the way of printing numbers
 
 	constexpr int N = 918;
 	constexpr int a1 = 5 + 3;
@@ -30,7 +31,6 @@ int main ()
 	Matrix x (1, N);
 
 	for (int i = 0; i < A.y; i++)
-	{
 		for (int j = 0; j < A.x; j++)
 		{
 			if (i == j)
@@ -44,62 +44,60 @@ int main ()
 			else if (j == i + 2)
 				A.matrix[i][j] = a3;
 		}
-	}
 
 	for (int i = 0; i < b.y; i++)
-	{
 		for (int j = 0; j < b.x; j++)
-		{
 			b.matrix[i][j] = sin (i * 6);
-		}
-	}
 
+	Jacobi (A, x, b);
 
+	for (int i = 0; i < x.y; i++)
+		for (int j = 0; j < x.x; j++)
+			x.matrix[i][j] = 0;
 
-	Matrix tmp_a (3, 3);
-	tmp_a.matrix[0][0] = 1.5;
-	tmp_a.matrix[0][1] = 1.1;
-	tmp_a.matrix[0][2] = -0.3;
-	tmp_a.matrix[1][0] = 1.1;
-	tmp_a.matrix[1][1] = 1.5;
-	tmp_a.matrix[1][2] = 1.1;
-	tmp_a.matrix[2][0] = 0.3;
-	tmp_a.matrix[2][1] = 1.1;
-	tmp_a.matrix[2][2] = 2.0;
+	Gauss_Seidel (A, x, b);
+
+// ========================================================================================   Next  ================================== //
+
+	constexpr int a1c = 3;
+
+	for (int i = 0; i < A.y; i++)
+		for (int j = 0; j < A.x; j++)
+			if (i == j)
+				A.matrix[i][j] = a1c;
+
+	Matrix L (4, 4);
+	Matrix U (4, 4);
 	
-	Matrix tmp_b (1, 3);
-	tmp_b.matrix[0][0] = 1;
-	tmp_b.matrix[1][0] = 2;
-	tmp_b.matrix[2][0] = 1;
+	U.matrix[0][0] = 2;
+	U.matrix[0][1] = 1;
+	U.matrix[0][2] = 1;
+	U.matrix[0][3] = 0;
+	U.matrix[1][0] = 4;
+	U.matrix[1][1] = 3;
+	U.matrix[1][2] = 3;
+	U.matrix[1][3] = 1;
+	U.matrix[2][0] = 8;
+	U.matrix[2][1] = 7;
+	U.matrix[2][2] = 9;
+	U.matrix[2][3] = 5;
+	U.matrix[3][0] = 6;
+	U.matrix[3][1] = 7;
+	U.matrix[3][2] = 9;
+	U.matrix[3][3] = 8;
 
-	Matrix tmp_x (1, 3);
-	tmp_x.matrix[0][0] = 1;
-	tmp_x.matrix[1][0] = 1;
-	tmp_x.matrix[2][0] = 1;
+	U.print ();
 
-	Jacobi (tmp_a, tmp_x, tmp_b);
+	for (int i = 0; i < L.y; i++)
+		for (int j = 0; j < L.x; j++)
+			if (i == j)
+				L.matrix[i][j] = 1;
+
+	LU (L, U);
+	L.print ();
+	U.print ();
 
 
-	tmp_a.matrix[0][0] = 1.5;
-	tmp_a.matrix[0][1] = 1.1;
-	tmp_a.matrix[0][2] = -0.3;
-	tmp_a.matrix[1][0] = 1.1;
-	tmp_a.matrix[1][1] = 1.5;
-	tmp_a.matrix[1][2] = 1.1;
-	tmp_a.matrix[2][0] = 0.3;
-	tmp_a.matrix[2][1] = 1.1;
-	tmp_a.matrix[2][2] = 2.0;
-
-	tmp_b.matrix[0][0] = 1;
-	tmp_b.matrix[1][0] = 2;
-	tmp_b.matrix[2][0] = 1;
-
-	tmp_x.matrix[0][0] = 1;
-	tmp_x.matrix[1][0] = 1;
-	tmp_x.matrix[2][0] = 1;
-
-	Gauss_Seidel (tmp_a, tmp_x, tmp_b);
-	
 	
 	return 0;
 }
@@ -193,4 +191,15 @@ void Gauss_Seidel (Matrix& A, Matrix& x, Matrix& b)
 	time_point<Clock> end = Clock::now ();
 	milliseconds time = duration_cast<milliseconds>(end - start);
 	std::cout << time.count () << "ms\n\n";
+}
+
+void LU (Matrix& L, Matrix& U)
+{
+	for(int k = 0; k < L.y - 1; k++)
+		for (int j = k + 1; j < L.x; j++)
+		{
+			L.matrix[j][k] = U.matrix[j][k] / U.matrix[k][k];
+			for (int i = k; i < L.x; i++)
+				U.matrix[j][i] = U.matrix[j][i] - (L.matrix[j][k] * U.matrix[k][i]);
+		}
 }
