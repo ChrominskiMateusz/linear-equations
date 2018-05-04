@@ -29,6 +29,7 @@ Matrix Matrix::operator*(const Matrix& secound)
 {
 	Matrix to_ret (secound.x, y);
 	if (x != secound.y)
+
 	{
 		std::cout << "Size not correct\n";
 		return to_ret;
@@ -92,8 +93,17 @@ Matrix& Matrix::operator=(const Matrix& secound)
 	return *this;
 }
 
-Matrix::Matrix (const Matrix& m) :
-	x(m.x), y(m.y)
+Matrix::Matrix (Matrix&& m)
+	:matrix{ m.matrix },
+	x{ m.x },
+	y{ m.y }
+{
+	m.matrix = nullptr;
+}
+
+Matrix::Matrix (const Matrix& m)
+	:x{ m.x },
+	 y{ m.y }
 {
 	matrix = new double *[y];
 	for (int i = 0; i < y; i++)
