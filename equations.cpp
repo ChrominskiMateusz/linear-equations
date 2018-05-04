@@ -28,7 +28,7 @@ int main ()
 
 	std::cout << std::showpos << std::fixed << std::setprecision (2);      //   Setting the way of printing numbers
 
-	constexpr int N = 10;
+	constexpr int N = 918;
 	constexpr int a1 = 5 + 3;
 	constexpr int a2 = -1;
 	constexpr int a3 = -1;
@@ -55,15 +55,12 @@ int main ()
 	for (int i = 0; i < b.y; i++)
 		for (int j = 0; j < b.x; j++)
 			b.matrix[i][j] = sin (i*6);
-	
-	A.print ();
-	b.print ();
+
 	
 	Jacobi (A, x, b);
 	for (int i = 0; i < x.y; i++)
 		plik << x.matrix[i][0] << std::endl;
 	plik.close ();
-	x.print ();
 
 	for (int i = 0; i < x.y; i++)
 		for (int j = 0; j < x.x; j++)
@@ -74,7 +71,6 @@ int main ()
 	for (int i = 0; i < x.y; i++)
 		plik << x.matrix[i][0] << std::endl;
 	plik.close ();
-	x.print ();
 // ========================================================================================   Next  ================================== //
 
 	constexpr int a1c = 3;
@@ -83,13 +79,11 @@ int main ()
 		for (int j = 0; j < A.x; j++)
 			if (i == j)
 				A.matrix[i][j] = a1c;
-	A.print ();
 	plik.open ("LU.txt", std::ios::out);
 	LU_factorization (A, x, b);
 	for (int i = 0; i < x.y; i++)
 		plik << x.matrix[i][0] << std::endl;
 	plik.close ();
-	x.print ();
 
 	return 0;
 }
